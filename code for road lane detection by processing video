@@ -1,0 +1,104 @@
+pip install opencv-python numpy
+import cv2
+
+# Capture video from the webcam
+cap = cv2.VideoCapture('path_to_your_video.mp4')
+
+while cap.isOpened():
+    ret, frame = cap.read()
+    if not ret:
+        break
+
+    # Display the frame
+    cv2.imshow('Frame', frame)
+
+    # Press 'q' to exit
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+cap.release()
+cv2.destroyAllWindows()
+import cv2
+import numpy as np
+
+def preprocess_frame(frame):
+    # Convert to grayscale
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+    # Apply Gaussian blur
+    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+
+    # Apply Canny edge detection
+    edges = cv2.Canny(blurred, 50, 150)
+
+    return edges
+
+# Capture video from the webcam
+cap = cv2.VideoCapture('path_to_your_video.mp4')
+
+while cap.isOpened():
+    ret, frame = cap.read()
+    if not ret:
+        break
+
+    edges = preprocess_frame(frame)
+
+    # Display the edges
+    cv2.imshow('Edges', edges)
+
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+cap.release()
+cv2.destroyAllWindows()
+def detect_lanes(edges):
+    lines = cv2.HoughLinesP(edges, 1, np.pi/180, threshold=50, minLineLength=100, maxLineGap=50)
+    return lines
+
+# Capture video from the webcam
+cap = cv2.VideoCapture('path_to_your_video.mp4')
+
+while cap.isOpened():
+    ret, frame = cap.read()
+    if not ret:
+        break
+
+    edges = preprocess_frame(frame)
+    lines = detect_lanes(edges)
+
+    for line in lines:
+        for x1, y1, x2, y2 in line:
+            cv2.line(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+
+    cv2.imshow('Lane Detection', frame)
+
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+cap.release()
+cv2.destroyAllWindows()
+def highlight_lanes(frame, lines):
+    for line in lines:
+        for x1, y1, x2, y2 in line:
+            cv2.line(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+    return frame
+
+# Capture video from the webcam
+cap = cv2.VideoCapture('path_to_your_video.mp4')
+
+while cap.isOpened():
+    ret, frame = cap.read()
+    if not ret:
+        break
+
+    edges = preprocess_frame(frame)
+    lines = detect_lanes(edges)
+    highlighted_frame = highlight_lanes(frame, lines)
+
+    cv2.imshow('Lane Detection', highlighted_frame)
+
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+cap.release()
+cv2.destroyAllWindows()
